@@ -1,0 +1,391 @@
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打地鼠</title>
+</head>
+
+<body>
+    <style>
+        #msgbox {
+            padding: 10px;
+            background-color: rgb(0, 0, 0);
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            width: 350px;
+            height: 175px;
+            border: 5px;
+            border: 0.5px solid rgba(255, 255, 255, 0.942);
+
+        }
+
+        #creat[acc=y] {
+
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100000;
+
+        }
+
+        #btn2 {
+
+            color: rgb(255, 255, 255);
+            background-color: rgba(5, 59, 209, 0.616);
+            width: 70px;
+            height: 40px;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            border: 5px;
+            border-style: double;
+            border-radius: 5px;
+            /* 雙線框 */
+
+        }
+
+        #creat[acc=n] {
+            display: none;
+        }
+
+
+
+        /* item父元素 */
+        .box {
+            background-color: rgb(236, 236, 236);
+            width: 500px;
+            height: 500px;
+            margin: auto;
+            position: relative;
+            border: 0.5px solid rgba(7, 6, 6, 0.942);
+        }
+
+
+
+        /* 子元素 */
+
+        .item {
+            box-sizing: border-box;
+            width: calc(100% / 3);
+            height: calc(100% / 3);
+            border: 0.5px solid rgba(7, 6, 6, 0.942);
+            /* outline: 1px solid rgb(76, 65, 65); */
+
+            background-color: rgb(37, 37, 38);
+            float: left;
+            display: flex;
+            /* 水平置中 */
+            justify-content: center;
+            /* 垂直置中 */
+            align-items: center;
+            font-size: 50px;
+            /* margin-right: -1px;
+            margin-bottom: -1px; */
+        }
+
+        .item:hover {
+            border: 0.5px solid rgb(255, 255, 255);
+            /* outline: 1px solid rgb(237, 4, 4); */
+            /* 滑鼠移入變小手手 */
+            cursor: pointer;
+        }
+
+        /* hover滑鼠移入後的樣式 */
+
+        .item[acc=ture] {
+            /* 背景圖片url()裡面要放/後面加路.徑 */
+            background-image: url(./gophers.png);
+            /* 背景圖片的尺寸 可以用% cover(高度寬度全部填滿) contain(高度寬度選最少的填滿) */
+            background-size: contain;
+            /* 不重複貼上圖片*/
+            background-repeat: no-repeat;
+            /* 出現的位置 */
+            background-position: center center;
+            /* border-color: rgb(24, 3, 255); */
+            /* border: 0.5px solid rgb(255, 255, 255); */
+        }
+
+        #btn {
+            cursor: pointer;
+            width: 100px;
+            height: 50px;
+            font-size: 30px;
+            /* 相對定位 */
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: auto;
+            z-index: 1;
+        }
+
+        #btn[active=f] {
+            display: none;
+        }
+
+        /* 分數 */
+        .content {
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            /* 水平置中 */
+            justify-content: center;
+            /* 垂直置中 */
+            align-items: center;
+        }
+
+        .text {
+            font-size: 30px
+        }
+
+        body {
+            background-color: rgb(30, 30, 30);
+            color: white
+        }
+
+        .gg {
+            position: fixed;
+            top: 100px;
+            left: 100px;
+            width: 50px;
+            height: 50px;
+            z-index: 1000;
+            pointer-events: none;
+            color: rgb(0, 255, 42);
+            font-size: 50px;
+
+            animation-duration: 1s;
+            animation-name: fuck123123;
+        }
+
+        @keyframes fuck123123 {
+            from {
+                color: aqua;
+                transform: translateY(0px);
+            }
+
+            to {
+                color: rgb(0, 255, 42);
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+    <div id="creat" acc="n">
+        <div id="msgbox">
+            <button id="btn2" onclick="cancel()">消失</button>
+        </div>
+    </div>
+
+    <div class="gg"></div>
+
+    <h1>打地鼠</h1>
+
+    <div class="content">
+        <div class="text" id="point">分數:x</div>
+        <div class="text" id="time" active="">剩餘時間:30</div>
+        <div class="box">
+            <button onclick='gameStart()' id="btn">開始</button>
+            <div class="item" data-no="1" acc=a></div>
+            <div class="item" data-no="2" acc=a></div>
+            <div class="item" data-no="3" acc=a></div>
+            <div class="item" data-no="4" acc=a></div>
+            <div class="item" data-no="5" acc=a></div>
+            <div class="item" data-no="6" acc=a></div>
+            <div class="item" data-no="7" acc=a></div>
+            <div class="item" data-no="8" acc=a></div>
+            <div class="item" data-no="9" acc=a></div>
+        </div>
+    </div>
+    
+    <script>
+        var domDiv = document.querySelectorAll(".item")
+        var domPoint = document.querySelector("#point")
+        var domTime = document.querySelector("#time")
+        var point = 0; //分數
+        var gameDuration = 30; //進行一場打地鼠遊戲的時長
+        var nowS = gameDuration; //這一局剩餘的時間
+        var isRun = false; //是否運行中
+        var clickCount = 0
+        var correct = 0
+        var mistake = 0
+        var domBtn = document.querySelector("#btn")
+        var domCreat = document.querySelector("#creat")
+
+        //    陣列的div
+        for (let i = 0; i < domDiv.length; i++) {
+            const div = domDiv[i];
+            div.addEventListener("click", function (e) {
+                var dataNo = e.target.getAttribute("data-no");
+
+                if (isRun == false) { return; }
+                // 點到地鼠
+                if (div.getAttribute("acc") == "ture") {
+                    point = point + 1
+                    setP(point)
+                    correct = correct + 1
+                    scoreEffects(1,e.clientX,e.clientY)
+                } else {// 沒有點到地鼠
+                    point = point - 1
+                    setP(point)
+                    mistake = mistake + 1
+                    scoreEffects(-1,e.clientX,e.clientY)
+                }
+                reset()
+                clickCount = clickCount + 1
+                console.log(dataNo);
+            });
+        }
+
+        //    function creat(){
+        //    var domDiv3 = document.createElement("div")
+        //    domDiv3.innerHTML = `+1`
+        //    domDiv3.setAttribute("id", "creat")
+        //    document.body.appendChild(domDiv3)
+        // }
+
+
+        function cancel() {
+            domCreat.setAttribute("acc", "n");
+
+
+        }
+
+        // scoreEffects 顯示 +1 or -1
+        function scoreEffects(val, x, y) {
+
+            var domDiv2 = document.createElement("div")
+
+            if (val > 0) {
+                domDiv2.innerHTML = `<span>+${val}</span>`
+            } else {
+                domDiv2.innerHTML = `<span style="color:rgb(245, 0, 0);">${val}</span>`
+            }
+            domDiv2.setAttribute("class", "gg")
+            document.body.appendChild(domDiv2)
+
+            setTimeout(() => {
+                domDiv2.parentNode.removeChild(domDiv2);
+
+            }, 300);
+            
+            /* console.log(e)
+             console.log("pageX: ", e.pageX,
+                 "pageY: ", e.pageY,
+                 "clientX: ", e.clientX,
+                 "clientY:", e.clientY)*/
+
+            domDiv2.style.left = x - 25 + "px";
+            domDiv2.style.top = y - 25 + "px";
+        }
+        // window.addEventListener('mousedown', (e) => {
+        //     fff(1,e.clientX,e.clientY)
+        // });
+
+
+
+
+
+
+        function showMsg() {
+            domCreat.setAttribute("acc", "y");
+
+        }
+
+        // 檢查網頁的寬度
+        function init() {
+            var domBox = document.querySelector(".box")
+            if (document.body.clientWidth >= 500) {
+                domBox.style.width = 500 + "px"
+                domBox.style.height = 500 + "px"
+            } else {
+                domBox.style.width = document.body.clientWidth - 20 + "px"
+                domBox.style.height = document.body.clientWidth - 20 + "px"
+            }
+        }
+        init()
+
+        function setP(pp) {
+            domPoint.innerHTML = `分數:${pp}`
+        }
+
+        function setTime(time) {
+            domTime.innerHTML = `剩餘時間:${time}`
+        }
+
+        function random(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min
+
+        }
+
+        // 重製一隻地鼠
+        function reset() {
+            for (let i = 0; i < 9; i++) {
+                domDiv[i].setAttribute("acc", "a");
+            }
+            domDiv[random(0, 8)].setAttribute("acc", "ture");
+        }
+
+        //重製地鼠分數以及開始
+        function gameStart() {
+            reset()
+            point = 0
+            setP(point)
+            nowS = gameDuration
+            setTime(nowS)
+            isRun = true
+            domBtn.setAttribute("active", "f")
+        }
+
+
+
+
+        function end() {
+
+            // 設置遊戲為結束狀態
+            isRun = false;
+            // 計算正確率
+            //var percent = correct === 0 ? 0 : (100 * correct / (correct + mistake)).toFixed(2);
+            var percent = 0
+            if (correct + mistake == 0) {
+                percent = 0
+            } else {
+                percent = (100 * correct / (correct + mistake)).toFixed(2)
+            }
+
+            // 結束後顯示在螢幕上的數據
+
+            var totle = `結束了 點擊了${clickCount}次`
+            totle += `<br>` + `點到地鼠的次數：${correct}`
+            totle += `<br>` + `點到錯誤格子的次數：${mistake}次`
+            totle += `<br>` + `正確率：${percent}%`;
+            showMsg()
+
+            domCreat.innerHTML = ("<div id='msgbox'>" + totle + "<button id=btn2 onclick=cancel()>取消</button></div>")
+            domBtn.setAttribute("active", "")
+
+        }
+
+        setInterval(() => {
+            // console.log(222)
+            if (isRun === true) {//還沒結束
+                nowS = nowS - 1;
+                setTime(nowS)
+                if (nowS <= 0) {//結束了
+                    end()
+
+                }
+            }
+        }, 1000 * 1);
+
+    </script>
+
+    </div>
+</body>
+
+</html>
